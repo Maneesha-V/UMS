@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { updateUserStart, updateUserSuccess, updateUserFailure,
-  deleteUserStart, deleteUserSuccess, deleteUserFailure
+  deleteUserStart, deleteUserSuccess, deleteUserFailure, signOut
  } from "../redux/user/userSlice";
 
 const Profile = () => {
@@ -102,6 +102,14 @@ const Profile = () => {
       dispatch(deleteUserFailure(err));
     }
   }
+  const handleSignOut = async () => {
+    try{
+      await fetch('/api/auth/signout')
+      dispatch(signOut());
+    } catch(err){
+      console.log(err);     
+    }
+  }
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-bold text-center my-7">Profile</h1>
@@ -158,7 +166,7 @@ const Profile = () => {
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer" onClick={handleDeleteAccount}>Delete Account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span className="text-red-700 cursor-pointer" onClick={handleSignOut}>Sign out</span>
       </div>
       <p className="text-red-700 mt-5 text-center">{error && 'Something went wrong!'}</p>
       <p className="text-green-700 mt-5 text-center">{updateSuccess && 'User updated successfully!'}</p>
