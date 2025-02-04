@@ -6,6 +6,7 @@ import Profile from './pages/Profile'
 import About from './pages/About'
 import Header from './components/Header'
 import PrivateRoute from './components/PrivateRoute'
+import AdminSignIn from './pages/AdminSignIn'
 import { ToastContainer } from "react-toastify"; 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,6 +22,7 @@ const App = () => {
       <Route element={<PrivateRoute />}>
         <Route path="/profile" element={<Profile />} />
       </Route>
+      <Route path="/admin/sign-in" element={<AdminSignIn />} />
     </Routes>
     <ToastContainer position="top-right" autoClose={3000} style={{ marginTop: "60px" }} />
   </BrowserRouter>
