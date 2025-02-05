@@ -24,3 +24,17 @@ export const adminUpdateUser = async (req, res, next) => {
         next(errorHandler(500,"Server error"))
     }
 }
+export const adminDeleteUser = async (req, res, next) => {
+    const { id } = req.params;
+    try{
+        const user = await User.findByIdAndDelete(id);
+
+        if (!user) {
+          return next(errorHandler(404, "User not found"));
+        }
+    
+        res.status(200).json({ success: true, message: "User deleted successfully" });
+    }catch(err){
+        next(errorHandler(500,"Server error"))
+    }
+}

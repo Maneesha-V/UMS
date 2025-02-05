@@ -50,8 +50,21 @@ const Dashboard = () => {
         toast.error("Failed to update user");
     }
   }
-  const handleDelete = (id) => {
-    
+  const handleDelete = async (id) => {
+    try{
+        const res = await fetch(`/api/admin/user/delete/${id}`,{
+            method: 'DELETE'
+        })
+        const data = await res.json();
+        if(data.success){
+            setUsers(users.filter((user) => user._id !== id))
+            toast.success("User deleted successfully")
+        }else{
+            toast.error("Failed to delete user")
+        }
+    }catch(err){
+        toast.error("Error deleting user");
+    }
   }
   return (
     <div className="p-6">
