@@ -7,13 +7,19 @@ const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [editingUserId, setEditingUserId] = useState(null);
   const [editedUser, setEditedUser] = useState({});
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 3; 
+  
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await fetch("/api/admin/users");
         const data = await res.json();
         console.log("data", data);
-        setUsers(data);
+        setUsers(data)     
+        setFilteredUsers(data);   
       } catch (err) {
         toast.error("Failed to load users");
       }
@@ -66,9 +72,43 @@ const Dashboard = () => {
         toast.error("Error deleting user");
     }
   }
+  const handleCreateUser = () => {
+
+  }
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    const filtered = users.filter(
+        (user) => user.username.toLowerCase().includes(query) ||
+        user.email.toLowerCase().includes(query)
+    );
+    console.log("filtered",filtered);
+    
+    setFilteredUsers(filtered);
+    setCurrentPage(1);
+  }
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = searchQuery ? filteredUsers.slice(indexOfFirstUser, indexOfLastUser) :
+  users.slice(indexOfFirstUser,indexOfLastUser)
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Admin Dashboard - Users</h2>
+    <div className="p-6  mb-3">
+      <h2 className="text-3xl font-bold text-center my-7">Admin Dashboard</h2>
+      <div className="flex justify-between mb-4">
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchQuery}
+          onChange={handleSearch}
+          className="border p-2 rounded w-1/3"
+        />
+        <button
+          onClick={handleCreateUser}
+          className="bg-green-700 text-white px-4 py-2 rounded"
+        >
+          + Create User
+        </button>
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-300">
           <thead>
@@ -81,7 +121,7 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {currentUsers.map((user) => (
               <tr key={user._id} className="text-center border">
                 <td className="px-4 py-2 border">
                   <img
@@ -164,6 +204,23 @@ const Dashboard = () => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div className="flex justify-center mt-4">
+        {Array.from({ length: Math.ceil((searchQuery ? filteredUsers.length : users.length) / usersPerPage) }).map(
+          (_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentPage(index + 1)}
+              className={`px-3 py-1 mx-1 rounded ${
+                currentPage === index + 1
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-300 text-black"
+              }`}
+            >
+              {index + 1}
+            </button>
+          )
+        )}
       </div>
     </div>
   );
