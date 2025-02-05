@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector }  from "react-redux";
 import { signInStart, signInSuccess, signInFailure } from "../redux/user/userSlice.js";
 import { useNavigate } from "react-router-dom";
-import OAuth from "../components/OAuth.jsx";
+import OAuthAdmin from "../components/OAuthAdmin.jsx";
 
 const AdminSignIn = () => {
     const [formData,setFormData] = useState({});
@@ -47,7 +47,7 @@ const AdminSignIn = () => {
         className='bg-slate-100 p-3 rounded-lg text-lg' />
         <button className='bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95
         disabled:opacity-80v text-lg'>{loading ? 'Loading...' :'Sign In'}</button>
-        <OAuth />
+        <OAuthAdmin />
       </form>
       <p className="text-red-700 mt-5 text-center">{error ? error.message || 'Something went wrong!' : ""}</p>
     </div>
