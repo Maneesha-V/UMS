@@ -5,7 +5,11 @@ import { useDispatch } from "react-redux";
 import { updateUserStart, updateUserSuccess, updateUserFailure,
   deleteUserStart, deleteUserSuccess, deleteUserFailure, signOut
  } from "../redux/user/userSlice";
-
+ import {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+} from "../validation";
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
@@ -14,6 +18,8 @@ const Profile = () => {
   const [imageError, setImageError] = useState(null);
   const [formData, setFormData] = useState({});
   const [updateSuccess,setUpdateSuccess] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -65,10 +71,29 @@ const Profile = () => {
   }
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const isUsernameValid = validateUsername(formData.username);
+    const isEmailValid = validateEmail(formData.email);
+    if (!isUsernameValid || !isEmailValid) {
+      if (!isUsernameValid) {
+        setUsernameError(
+          "Invalid username. It should be between 3 and 15 characters."
+        );
+      } else {
+        setUsernameError("");
+      }
+
+      if (!isEmailValid) {
+        setEmailError("Invalid email format.");
+      } else {
+        setEmailError("");
+      }
+
+      return;
+    }
     try{
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`,{
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -98,6 +123,7 @@ const Profile = () => {
         return;
       }
       dispatch(deleteUserSuccess(data));
+      dispatch(signOut());
     } catch(err){
       dispatch(deleteUserFailure(err));
     }
@@ -142,6 +168,9 @@ const Profile = () => {
           className="bg-slate-100 rounded-lg p-3"
           onChange={handleChange}
         />
+        {usernameError && (
+          <p className="text-red-500 text-sm">{usernameError}</p>
+        )}
         <input
           type="text"
           id="email"
@@ -150,6 +179,9 @@ const Profile = () => {
           className="bg-slate-100 rounded-lg p-3"  
           onChange={handleChange}
         />
+        {emailError && (
+          <p className="text-red-500 text-sm">{emailError}</p>
+        )}
         <input
           type="text"
           id="password"

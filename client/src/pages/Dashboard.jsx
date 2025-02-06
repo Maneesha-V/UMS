@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { validateUsername, validateEmail, validatePassword } from "../validation";
+import {
+  validateUsername,
+  validateEmail,
+  validatePassword,
+} from "../validation";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -46,6 +50,20 @@ const Dashboard = () => {
     setEditedUser({ ...editedUser, [e.target.name]: e.target.value });
   };
   const handleUpdate = async (id) => {
+    const isUsernameValid = validateUsername(editedUser.username);
+    console.log("isUsernameValid", isUsernameValid);
+    const isEmailValid = validateEmail(editedUser.email);
+    if (!isUsernameValid || !isEmailValid ) {
+      if (!isUsernameValid) {
+        toast.error(
+          "Invalid username. It should be between 3 and 15 characters."
+        );
+      }
+      if (!isEmailValid) {
+        toast.error("Invalid email format.");
+      }
+      return;
+    }
     try {
       const res = await fetch(`/api/admin/user/update/${id}`, {
         method: "PUT",
@@ -85,21 +103,24 @@ const Dashboard = () => {
   };
   const handleCreateUser = async () => {
     const isUsernameValid = validateUsername(newUser.username);
-    console.log("isUsernameValid",isUsernameValid);
-    
-  const isEmailValid = validateEmail(newUser.email);
-  const isPasswordValid = validatePassword(newUser.password);
-    if(!isUsernameValid || !isEmailValid || !isPasswordValid){
+    console.log("isUsernameValid", isUsernameValid);
+    const isEmailValid = validateEmail(newUser.email);
+    const isPasswordValid = validatePassword(newUser.password);
+    if (!isUsernameValid || !isEmailValid || !isPasswordValid) {
       if (!isUsernameValid) {
-        toast.error("Invalid username. It should be between 3 and 15 characters.");
+        toast.error(
+          "Invalid username. It should be between 3 and 15 characters."
+        );
       }
       if (!isEmailValid) {
         toast.error("Invalid email format.");
       }
       if (!isPasswordValid) {
-        toast.error("Password must be at least 5 characters long and include both letters and numbers.");
+        toast.error(
+          "Password must be at least 5 characters long and include both letters and numbers."
+        );
       }
-      return; 
+      return;
     }
     try {
       const res = await fetch("/api/admin/user/create", {
