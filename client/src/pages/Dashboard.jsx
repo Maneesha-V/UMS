@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import { validateUsername, validateEmail, validatePassword } from "../validation";
 
 const Dashboard = () => {
   const { currentUser } = useSelector((state) => state.user);
   const [users, setUsers] = useState([]);
   const [editingUserId, setEditingUserId] = useState(null);
   const [editedUser, setEditedUser] = useState({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 3;
   const [showCreateUserForm, setShowCreateUserForm] = useState(false);
   const [newUser, setNewUser] = useState({
     username: "",
@@ -18,6 +15,10 @@ const Dashboard = () => {
     password: "",
     isAdmin: false,
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 3;
 
   const toggleFormVisibility = () => {
     setShowCreateUserForm(!showCreateUserForm);
@@ -83,6 +84,23 @@ const Dashboard = () => {
     }
   };
   const handleCreateUser = async () => {
+    const isUsernameValid = validateUsername(newUser.username);
+    console.log("isUsernameValid",isUsernameValid);
+    
+  const isEmailValid = validateEmail(newUser.email);
+  const isPasswordValid = validatePassword(newUser.password);
+    if(!isUsernameValid || !isEmailValid || !isPasswordValid){
+      if (!isUsernameValid) {
+        toast.error("Invalid username. It should be between 3 and 15 characters.");
+      }
+      if (!isEmailValid) {
+        toast.error("Invalid email format.");
+      }
+      if (!isPasswordValid) {
+        toast.error("Password must be at least 5 characters long and include both letters and numbers.");
+      }
+      return; 
+    }
     try {
       const res = await fetch("/api/admin/user/create", {
         method: "POST",
