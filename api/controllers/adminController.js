@@ -10,6 +10,27 @@ export const getUsers = async (req, res, next) => {
         next(errorHandler(500,"Server error"))
     }
 }
+export const adminCreateUser = async (req, res, next) => {
+    try{
+        console.log("body",req.body);
+        const { username, email, password, isAdmin } = req.body;
+        if(!username || !email || !password){
+            next(errorHandler(400,"All fields are required"));
+            return;
+        }
+        const existingUser = await User.findOne({email});
+        console.log("existingUser",existingUser);
+        if (existingUser) {
+            next(errorHandler(400,"User already exists"));
+            return;
+        }
+        const newUser = new User({username, email, password, isAdmin})
+        await newUser.save();
+        res.status(201).json(newUser);
+    }catch(err){
+        next(errorHandler(500,"Server error"))
+    }
+}
 export const adminUpdateUser = async (req, res, next) => {
     const { id } = req.params;
     const { username, email } = req.body; 
