@@ -1,4 +1,5 @@
 import User from "../models/userModel.js"
+import bcryptjs from "bcryptjs";
 import { errorHandler } from "../utils/error.js"
 
 
@@ -24,7 +25,8 @@ export const adminCreateUser = async (req, res, next) => {
             next(errorHandler(400,"User already exists"));
             return;
         }
-        const newUser = new User({username, email, password, isAdmin})
+        const hashedPassword = await bcryptjs.hashSync(password,10);
+        const newUser = new User({username, email, password: hashedPassword, isAdmin})
         await newUser.save();
         res.status(201).json(newUser);
     }catch(err){
